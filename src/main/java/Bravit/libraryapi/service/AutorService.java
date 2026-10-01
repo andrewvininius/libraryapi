@@ -1,7 +1,10 @@
 package Bravit.libraryapi.service;
 
+import Bravit.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import Bravit.libraryapi.model.Autor;
 import Bravit.libraryapi.repository.AutorRepository;
+import Bravit.libraryapi.repository.LivroRepository;
+import Bravit.libraryapi.validator.AutorValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,12 +14,17 @@ import java.util.UUID;
 @Service
 public class AutorService {
     private final AutorRepository repository;
+    private final AutorValidator validator;
+    private final LivroRepository livroRepository;
 
-    public AutorService(AutorRepository repository){
+    public AutorService(AutorRepository repository, AutorValidator validator, LivroRepository livroRepository){
         this.repository = repository;
+        this.validator = validator;
+        this.livroRepository = livroRepository;
     }
 
     public Autor salvar(Autor autor) {
+        validator.validar(autor);
         return repository.save(autor);
     }
 
@@ -24,7 +32,7 @@ public class AutorService {
         if (autor.getId() == null){
             throw new IllegalArgumentException("Para atualizar, é necessário que o autor já esteja salvo na base ID");
         }
-
+        validator.validar(autor);
         return repository.save(autor);
     }
 
@@ -32,6 +40,11 @@ public class AutorService {
         return repository.findById(id);
     }
     public void deletar(Autor autor){
+        if(possuiLivros(autor)){
+            throw new OperacaoNaoPermitidaException(
+                    "Não é permitido deletar um Autor possui livros cadatrados!");
+        }
+
         repository.delete(autor);
     }
 
@@ -66,5 +79,8 @@ public class AutorService {
         }
 
         return repository.findAll();
+    }
+    public boolean possuiLivros(Autor autor){
+        return livroRepository.ex
     }
 }

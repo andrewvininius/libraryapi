@@ -64,4 +64,6 @@ public interface LivroRepository extends JpaRepository<Livro, UUID> {
     @Query(" delete from Livro where genero = ?1")
     void deleteByGenero(GeneroLivro genero);
 
+    boolean existsByAutor(Autor autor);
+
 }
