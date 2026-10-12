@@ -10,7 +10,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
-@Configuration
+//@Configuration
 public class DatabaseConfiguration {
 
     @Value("${spring.datasource.url}")
@@ -32,7 +32,7 @@ public class DatabaseConfiguration {
         return ds;
     }
 //    docmentalao do hikari https://github.com/brettwooldridge/hikaricp
-    @Bean
+    //@Bean
     public DataSource hikariDataSource(){
         HikariConfig config = new HikariConfig();
         config.setUsername(username);

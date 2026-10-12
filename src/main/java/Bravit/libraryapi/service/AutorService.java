@@ -81,6 +81,6 @@ public class AutorService {
         return repository.findAll();
     }
     public boolean possuiLivros(Autor autor){
-        return livroRepository.ex
+        return livroRepository.existsByAutor(autor);
     }
 }

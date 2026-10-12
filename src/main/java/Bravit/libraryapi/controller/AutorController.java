@@ -2,6 +2,7 @@ package Bravit.libraryapi.controller;
 
 import Bravit.libraryapi.controller.dto.AutorDTO;
 import Bravit.libraryapi.controller.dto.ErroResposta;
+import Bravit.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import Bravit.libraryapi.exceptions.RegistroDuplicadoException;
 import Bravit.libraryapi.model.Autor;
 import Bravit.libraryapi.service.AutorService;
@@ -67,16 +68,22 @@ public class AutorController {
 
     }
 
+    // indempontente
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable("id") String id) {
-        var idAutor = UUID.fromString(id);
-        Optional<Autor> autorOptional = service.obterPorId(idAutor);
+    public ResponseEntity<Object> deletar(@PathVariable("id") String id) {
+        try{
+            var idAutor = UUID.fromString(id);
+            Optional<Autor> autorOptional = service.obterPorId(idAutor);
 
-        if (autorOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            if (autorOptional.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            service.deletar(autorOptional.get());
+            return ResponseEntity.noContent().build();
+        } catch (OperacaoNaoPermitidaException e) {
+            var erroResposta = ErroResposta.respostaPadrao(e.getMessage());
+            return ResponseEntity.status(erroResposta.status()).body(erroResposta);
         }
-        service.deletar(autorOptional.get());
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

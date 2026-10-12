@@ -6,6 +6,7 @@ import Bravit.libraryapi.model.Livro;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class LivroRepositoryTest {
 
     @Autowired
@@ -27,13 +29,15 @@ class LivroRepositoryTest {
     void salvarTest(){
         Livro livro = new Livro();
         livro.setIsbn("1234567890");
-        livro.setTitulo("Assim falou 1001");
+        livro.setTitulo("Assim");
         livro.setDataPublicacao(LocalDate.of(2020, 1, 1));
         livro.setGenero(GeneroLivro.FICCAO);
         livro.setPreco(new BigDecimal("10.00"));
 
-        Autor autor = autorRepository.findById(UUID.fromString("69fe528a-4e18-4879-967d-ef4b1b4d7810")).orElse(null);
-        livro.setAutor(new Autor());
+        Autor autor = autorRepository
+                .findById(UUID.fromString("042ff236-b26b-49a1-8783-4195232263c0"))
+                .orElse(null);
+        livro.setAutor(autor);
 
         repository.save(livro);
 
