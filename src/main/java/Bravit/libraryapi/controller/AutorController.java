@@ -6,14 +6,14 @@ import Bravit.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import Bravit.libraryapi.exceptions.RegistroDuplicadoException;
 import Bravit.libraryapi.model.Autor;
 import Bravit.libraryapi.service.AutorService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,18 +21,24 @@ import java.util.stream.Collectors;
 @RestController
 // http://localhost:8080/autores
 @RequestMapping("autores")
+@RequiredArgsConstructor
 public class AutorController {
 
     private final AutorService service;
 
-    public AutorController(AutorService service) {
-        this.service = service;
-    }
+    // A anotação @RequiredArgsConstructor, do Lombok, gera automaticamente
+    // um construtor para os atributos final desta classe.
+    // Por isso, não preciso escrever o construtor manualmente para receber
+    // o AutorService por injeção de dependência.
+
+//    public AutorController(AutorService service) {
+//        this.service = service;
+//    }
 
     // as duas faz a mesma coisa
     //@RequestMapping(method = RequestMethod.POST)
     @PostMapping
-    public ResponseEntity<Object> salvar(@RequestBody AutorDTO autor) {
+    public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDTO autor) {
         try {
             Autor autorEntidade = autor.mapearParaAutor();
             service.salvar(autorEntidade);
@@ -46,7 +52,7 @@ public class AutorController {
                     .toUri();
             return ResponseEntity.created(location).build();
             //return new ResponseEntity("Autor Salvo com sucesso! " + autor, HttpStatus.CREATED);
-        } catch (RegistroDuplicadoException e){
+        } catch (RegistroDuplicadoException e) {
             var erroDTO = ErroResposta.conflito(e.getMessage());
             return ResponseEntity.status(erroDTO.status()).body(erroDTO);
         }
@@ -71,7 +77,7 @@ public class AutorController {
     // indempontente
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deletar(@PathVariable("id") String id) {
-        try{
+        try {
             var idAutor = UUID.fromString(id);
             Optional<Autor> autorOptional = service.obterPorId(idAutor);
 
@@ -103,7 +109,7 @@ public class AutorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> atualizar(
-            @PathVariable("id") String id, @RequestBody AutorDTO dto) {
+            @PathVariable("id") String id, @RequestBody @Valid AutorDTO dto) {
         try {
 
             var idAutor = UUID.fromString(id);
@@ -120,7 +126,7 @@ public class AutorController {
             service.atualizar(autor);
 
             return ResponseEntity.noContent().build();
-        }catch (RegistroDuplicadoException e){
+        } catch (RegistroDuplicadoException e) {
             var erroDTO = ErroResposta.conflito(e.getMessage());
             return ResponseEntity.status(erroDTO.status()).body(erroDTO);
         }
